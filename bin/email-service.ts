@@ -2,6 +2,14 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { EmailServiceStack } from '../lib/email-service-stack';
+import { config } from 'dotenv';
+config()
+
+if (
+  !process.env.AWS_ACCOUNT ||
+  !process.env.AWS_REGION
+)
+  throw Error("Missing required environment variables (AWS_ACCOUNT, AWS_REGION)");
 
 const app = new cdk.App();
 new EmailServiceStack(app, 'EmailServiceStack', {
@@ -15,7 +23,7 @@ new EmailServiceStack(app, 'EmailServiceStack', {
 
   /* Uncomment the next line if you know exactly what Account and Region you
    * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
+  env: { account: process.env.AWS_ACCOUNT, region: process.env.AWS_REGION },
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });

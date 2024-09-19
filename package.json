@@ -5,23 +5,31 @@
     "email-service": "bin/email-service.js"
   },
   "scripts": {
-    "build": "tsc",
+    "format": "prettier -w ./src/*.ts ./lib/*.ts",
+    "prepare-lambda-code": "rimraf dist && npm prune --omit=dev && mkdir dist && cp -r node_modules ./dist/node_modules && cp ./src/*.js ./dist/",
+    "build": "tsc && npm run prepare-lambda-code",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "local": "node dist/index.js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "22.5.4",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
+    "@types/nodemailer": "^6.4.16",
     "aws-cdk": "2.159.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "~5.6.2"
   },
   "dependencies": {
     "aws-cdk-lib": "2.159.0",
     "constructs": "^10.0.0",
+    "dotenv": "^16.4.5",
+    "nodemailer": "^6.9.15",
     "source-map-support": "^0.5.21"
   }
 }
