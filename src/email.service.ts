@@ -13,13 +13,13 @@ export type EmailOptions = {
 export class EmailService {
   public static send(emailOptions: EmailOptions): Promise<boolean> {
     if (
-      !process.env.MAILER_SERVICE ||
       !process.env.FROM_EMAIL ||
       !process.env.FROM_EMAIL_PASS ||
-      !process.env.TO_EMAIL
+      !process.env.TO_EMAIL ||
+      !process.env.EMAIL_HOST
     )
       throw Error(
-        "Missing required environment variables (MAILER_SERVICE, FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL)",
+        "Missing required environment variables (EMAIL_HOST, FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL)",
       );
 
     const defaultOptions = {
@@ -28,7 +28,9 @@ export class EmailService {
     };
     return new Promise((resolve) => {
       const transporter = mailer.createTransport({
-        service: process.env.MAILER_SERVICE,
+        host: process.env.EMAIL_HOST,
+        port: 587,
+        secure: false,
         auth: {
           user: process.env.FROM_EMAIL,
           pass: process.env.FROM_EMAIL_PASS,

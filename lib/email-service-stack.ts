@@ -10,13 +10,13 @@ export class EmailServiceStack extends cdk.Stack {
     super(scope, id, props);
 
     if (
-      !process.env.MAILER_SERVICE ||
+      !process.env.EMAIL_HOST ||
       !process.env.FROM_EMAIL ||
       !process.env.FROM_EMAIL_PASS ||
       !process.env.TO_EMAIL
     )
       throw Error(
-        "Missing required environment variables (MAILER_SERVICE, FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL)",
+        "Missing required environment variables (EMAIL_HOST, FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL)",
       );
 
     const emailServiceLambda = new lambda.Function(this, "EmailService", {
@@ -24,7 +24,7 @@ export class EmailServiceStack extends cdk.Stack {
       handler: "index.handler",
       code: lambda.Code.fromAsset(path.join(__dirname, "..", "dist")),
       environment: {
-        MAILER_SERVICE: process.env.MAILER_SERVICE,
+        EMAIL_HOST: process.env.EMAIL_HOST,
         FROM_EMAIL: process.env.FROM_EMAIL,
         FROM_EMAIL_PASS: process.env.FROM_EMAIL_PASS,
         TO_EMAIL: process.env.TO_EMAIL,

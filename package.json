@@ -7,7 +7,7 @@
   "scripts": {
     "format": "prettier -w ./src/*.ts ./lib/*.ts",
     "prepare-lambda-code": "rimraf dist && npm prune --omit=dev && mkdir dist && cp -r node_modules ./dist/node_modules && cp ./src/*.js ./dist/",
-    "build": "tsc && npm run prepare-lambda-code",
+    "build": "tsc && npm run prepare-lambda-code && npm i",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
