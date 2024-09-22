@@ -27,6 +27,7 @@ export async function handler(
   } else {
     if (!event.body) {
       const errorMsg = "Bad input: body is empty";
+      console.log(event);
       console.error(errorMsg);
       return {
         statusCode: 400,
