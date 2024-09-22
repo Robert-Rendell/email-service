@@ -40,5 +40,10 @@ export class EmailServiceStack extends cdk.Stack {
     new cdk.CfnOutput(this, "EmailServiceUrlOutput", {
       value: emailServiceFunctionUrl.url,
     });
+
+    new cdk.CfnOutput(this, "LambdaFunctionArn", {
+      value: emailServiceLambda.functionArn,
+      exportName: "LambdaFunctionArn",
+    });
   }
 }

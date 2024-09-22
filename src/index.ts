@@ -1,4 +1,9 @@
 import { config } from "dotenv";
+import {
+  APIGatewayProxyEventV2,
+  APIGatewayProxyResult,
+  SNSEvent,
+} from "aws-lambda";
 import { EmailService } from "./email.service";
 config();
 
@@ -7,21 +12,49 @@ type EventBody = {
   text: string | undefined;
 };
 
-export async function handler(event: { body: string }) {
+function isSNSEvent(event: any): event is SNSEvent {
+  return "Records" in event;
+}
+
+export async function handler(
+  event: APIGatewayProxyEventV2 | SNSEvent,
+): Promise<APIGatewayProxyResult> {
   let eventBody: EventBody;
+
+  let jsonString;
+  if (isSNSEvent(event)) {
+    jsonString = event.Records[0].Sns.Message;
+  } else {
+    if (!event.body) {
+      const errorMsg = "Bad input: body is empty";
+      console.error(errorMsg);
+      return {
+        statusCode: 400,
+        body: errorMsg,
+      };
+    }
+    jsonString = event.body;
+  }
+
   try {
-    eventBody = JSON.parse(event.body);
+    eventBody = JSON.parse(jsonString);
   } catch (e) {
+    const errorMsg = "Bad input: malformed JSON";
+    console.error(errorMsg);
     return {
       statusCode: 400,
-      body: "Bad input: malformed JSON",
+      body: errorMsg,
     };
   }
+
   const { subject, text } = eventBody;
   if (!subject || !text) {
+    const errorMsg =
+      "Bad input: subject or text properties not provided in POST body";
+    console.error(errorMsg);
     return {
       statusCode: 400,
-      body: "Bad input: subject or text properties not provided in POST body",
+      body: errorMsg,
     };
   }
   try {
@@ -29,8 +62,10 @@ export async function handler(event: { body: string }) {
       subject,
       text,
     });
+    console.log("Email sent!");
     return {
       statusCode: 200,
+      body: "Sent!",
     };
   } catch (e) {
     return {

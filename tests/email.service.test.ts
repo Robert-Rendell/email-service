@@ -1,5 +1,4 @@
-import { config } from "dotenv";
-import { EmailService } from "./email.service";
+import { EmailService } from "../src/email.service";
 
 describe("Email Service", () => {
   test("it should error when env vars are missing", async () => {
@@ -13,7 +12,7 @@ describe("Email Service", () => {
       error = e;
     }
     expect(error.message).toEqual(
-      "Missing required environment variables (MAILER_SERVICE, FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL)",
+      "Missing required environment variables (EMAIL_HOST, FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL)",
     );
   });
 });
