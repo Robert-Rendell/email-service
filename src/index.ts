@@ -16,42 +16,56 @@ function isSNSEvent(event: any): event is SNSEvent {
   return "Records" in event;
 }
 
+function isFunctionURLInvocation(event: any): event is APIGatewayProxyEventV2 {
+  return "body" in event;
+}
+
+function isEventBody(event: any): event is EventBody {
+  return "subject" in event && "text" in event;
+}
+
 export async function handler(
-  event: APIGatewayProxyEventV2 | SNSEvent,
+  event: APIGatewayProxyEventV2 | SNSEvent | EventBody,
 ): Promise<APIGatewayProxyResult> {
   let eventBody: EventBody;
 
-  let jsonString;
-  if (isSNSEvent(event)) {
-    jsonString = event.Records[0].Sns.Message;
+  if (isEventBody(event)) {
+    eventBody = event;
   } else {
-    if (!event.body) {
-      const errorMsg = "Bad input: body is empty";
-      console.log(event);
+    let jsonString;
+    if (isSNSEvent(event)) {
+      jsonString = event.Records[0].Sns.Message;
+    } else {
+      if (isFunctionURLInvocation(event)) {
+        jsonString = event.body;
+      }
+      if (!event.body) {
+        const errorMsg = "Bad input: body is empty";
+        console.log(event);
+        console.error(errorMsg);
+        return {
+          statusCode: 400,
+          body: errorMsg,
+        };
+      }
+    }
+
+    try {
+      eventBody = JSON.parse(jsonString ?? "");
+    } catch (e) {
+      const errorMsg = "Bad input: malformed JSON";
       console.error(errorMsg);
       return {
         statusCode: 400,
         body: errorMsg,
       };
     }
-    jsonString = event.body;
-  }
-
-  try {
-    eventBody = JSON.parse(jsonString);
-  } catch (e) {
-    const errorMsg = "Bad input: malformed JSON";
-    console.error(errorMsg);
-    return {
-      statusCode: 400,
-      body: errorMsg,
-    };
   }
 
   const { subject, text } = eventBody;
   if (!subject || !text) {
     const errorMsg =
-      "Bad input: subject or text properties not provided in POST body";
+      "Bad input: subject or text properties are empty or not provided in POST body";
     console.error(errorMsg);
     return {
       statusCode: 400,

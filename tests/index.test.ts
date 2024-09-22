@@ -75,8 +75,51 @@ jest.spyOn(console, 'error').mockImplementation();
 jest.spyOn(console, 'log').mockImplementation();
 
 describe("index.handler", () => {
+  describe('SDK event', () => {
+    test("it returns an error if the event body is empty", async () => {
+      const result = await handler({} as any);
+      expect(result).toEqual({
+        statusCode: 400,
+        // TODO - error messages are vague because the lambda is trying to handle too many different types of events
+        body: "Bad input: body is empty",
+      });
+    });
+  
+    test("it return an error if the event body does not contain the text property", async () => {
+      const result = await handler({
+        "subject": "the subject"
+      } as any);
+      expect(result).toEqual({
+        statusCode: 400,
+        // TODO - error messages are vague because the lambda is trying to handle too many different types of events
+        body: "Bad input: body is empty",
+      });
+    });
+  
+    test("it return an error if the event body does not contain the subject property", async () => {
+      const result = await handler({
+        "text": "the text"
+      } as any);
+      expect(result).toEqual({
+        statusCode: 400,
+        // TODO - error messages are vague because the lambda is trying to handle too many different types of events
+        body: "Bad input: body is empty",
+      });
+    });
+  
+    test("attempts to send email if both subject and text properties exist in post body", async () => {
+      const result = await handler({
+        subject: "the subject",
+        text: "the body",
+      } as any);
+      expect(result).toEqual({
+        body: "Sent!",
+        statusCode: 200,
+      });
+    });
+  });
   describe('SNS event', () => {
-    test("it return an error if the event body is empty", async () => {
+    test("it returns an error if the event body is empty", async () => {
       const body = "";
       const result = await handler(exampleEvent(body, 'sns'));
       expect(result).toEqual({
@@ -90,7 +133,7 @@ describe("index.handler", () => {
       const result = await handler(exampleEvent(body, 'sns'));
       expect(result).toEqual({
         statusCode: 400,
-        body: "Bad input: subject or text properties not provided in POST body",
+        body: "Bad input: subject or text properties are empty or not provided in POST body",
       });
     });
   
@@ -99,7 +142,7 @@ describe("index.handler", () => {
       const result = await handler(exampleEvent(body, 'sns'));
       expect(result).toEqual({
         statusCode: 400,
-        body: "Bad input: subject or text properties not provided in POST body",
+        body: "Bad input: subject or text properties are empty or not provided in POST body",
       });
     });
   
@@ -113,7 +156,7 @@ describe("index.handler", () => {
   });
 
   describe('Function URL event', () => {
-    test("it return an error if the event body is empty", async () => {
+    test("it returns an error if the event body is empty", async () => {
       const body = "";
       const result = await handler(exampleEvent(body));
       expect(result).toEqual({
@@ -122,12 +165,12 @@ describe("index.handler", () => {
       });
     });
   
-    test("it return an error if the event body does not contain the text property", async () => {
+    test("it returns an error if the event body does not contain the text property", async () => {
       const body = '{\n    "subject": "the subject"}';
       const result = await handler(exampleEvent(body));
       expect(result).toEqual({
         statusCode: 400,
-        body: "Bad input: subject or text properties not provided in POST body",
+        body: "Bad input: subject or text properties are empty or not provided in POST body",
       });
     });
   
@@ -136,7 +179,7 @@ describe("index.handler", () => {
       const result = await handler(exampleEvent(body));
       expect(result).toEqual({
         statusCode: 400,
-        body: "Bad input: subject or text properties not provided in POST body",
+        body: "Bad input: subject or text properties are empty or not provided in POST body",
       });
     });
   
