@@ -7,7 +7,8 @@ export type EmailOptions = {
   /**
    * email body
    */
-  text: string;
+  text?: string;
+  html?: string;
 };
 
 export class EmailService {

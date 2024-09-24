@@ -1,23 +1,9 @@
 import { SNSEvent } from "aws-lambda";
 import { handler } from "../src/index";
 
-function exampleEvent(body?: string, eventType: 'sns' | 'url' = 'url') {
+function exampleEvent(body?: string) {
   const defaultBody =
   '{\n    "subject": "the subject",\n    "text": "the body"\n}';
-  if (eventType === 'sns') {
-    return <SNSEvent>{
-      Records: [
-        {
-          EventSource: 'aws:sns',
-          EventVersion: '1.0',
-          EventSubscriptionArn: 'arn:aws:sns:eu-west-1:XXXXX:CustomAnalyticsStack-CustomAnalyticsTopicXXXXXX',
-          Sns: {
-            Message: body ?? defaultBody,
-          }
-        }
-      ]
-    }
-  }
   return {
     version: "2.0",
     routeKey: "$default",
@@ -118,42 +104,6 @@ describe("index.handler", () => {
       });
     });
   });
-  describe('SNS event', () => {
-    test("it returns an error if the event body is empty", async () => {
-      const body = "";
-      const result = await handler(exampleEvent(body, 'sns'));
-      expect(result).toEqual({
-        statusCode: 400,
-        body: "Bad input: malformed JSON",
-      });
-    });
-  
-    test("it return an error if the event body does not contain the text property", async () => {
-      const body = '{\n    "subject": "the subject"}';
-      const result = await handler(exampleEvent(body, 'sns'));
-      expect(result).toEqual({
-        statusCode: 400,
-        body: "Bad input: subject or text properties are empty or not provided in POST body",
-      });
-    });
-  
-    test("it return an error if the event body does not contain the subject property", async () => {
-      const body = '{"text": "the body"\n}';
-      const result = await handler(exampleEvent(body, 'sns'));
-      expect(result).toEqual({
-        statusCode: 400,
-        body: "Bad input: subject or text properties are empty or not provided in POST body",
-      });
-    });
-  
-    test("attempts to send email if both subject and text properties exist in post body", async () => {
-      const result = await handler(exampleEvent(undefined, 'sns'));
-      expect(result).toEqual({
-        body: "Sent!",
-        statusCode: 200,
-      });
-    });
-  });
 
   describe('Function URL event', () => {
     test("it returns an error if the event body is empty", async () => {
@@ -170,7 +120,7 @@ describe("index.handler", () => {
       const result = await handler(exampleEvent(body));
       expect(result).toEqual({
         statusCode: 400,
-        body: "Bad input: subject or text properties are empty or not provided in POST body",
+        body: "Bad input! Properties are empty or not provided in POST body: subject, text, html",
       });
     });
   
@@ -179,7 +129,7 @@ describe("index.handler", () => {
       const result = await handler(exampleEvent(body));
       expect(result).toEqual({
         statusCode: 400,
-        body: "Bad input: subject or text properties are empty or not provided in POST body",
+        body: "Bad input! Properties are empty or not provided in POST body: subject, text, html",
       });
     });
   

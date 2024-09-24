@@ -7,6 +7,7 @@ describe("Email Service", () => {
       await EmailService.send({
         subject: "hi",
         text: "body",
+        html: "<p>body</p>",
       });
     } catch (e) {
       error = e;
