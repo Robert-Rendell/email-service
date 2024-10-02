@@ -1,8 +1,5 @@
 import { config } from "dotenv";
-import {
-  APIGatewayProxyEventV2,
-  APIGatewayProxyResult,
-} from "aws-lambda";
+import { APIGatewayProxyEventV2, APIGatewayProxyResult } from "aws-lambda";
 import { EmailService } from "./email.service";
 config();
 

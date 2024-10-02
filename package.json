@@ -7,12 +7,12 @@
   "scripts": {
     "format": "prettier -w ./src/*.ts ./lib/*.ts",
     "prepare-lambda-code": "rimraf dist && npm prune --omit=dev && mkdir dist && cp -r node_modules ./dist/node_modules && cp ./src/*.js ./dist/",
-    "clean": "rm ./lib/*.js | rm ./lib/*.d.ts | rm ./src/*.js | rm ./src/*.d.ts | rm ./tests/*.js | rm ./tests/*.d.ts",
     "build": "tsc && npm run prepare-lambda-code && npm i",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "local": "node dist/index.js"
+    "local": "node dist/index.js",
+    "clean": "find ./lib -name '*.js' -delete && find ./lib -name '*.d.ts' -delete && find ./src -name '*.js' -delete && find ./src -name '*.d.ts' -delete && find ./tests -name '*.js' -delete && find ./tests -name '*.d.ts' -delete"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",
