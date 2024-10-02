@@ -12,7 +12,7 @@ export type EmailOptions = {
 };
 
 export class EmailService {
-  public static send(emailOptions: EmailOptions): Promise<boolean> {
+  public static send(emailOptions: EmailOptions) {
     if (
       !process.env.FROM_EMAIL ||
       !process.env.FROM_EMAIL_PASS ||
@@ -27,7 +27,7 @@ export class EmailService {
       from: process.env.FROM_EMAIL,
       to: process.env.TO_EMAIL,
     };
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const transporter = mailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: 587,
@@ -43,7 +43,7 @@ export class EmailService {
       transporter.sendMail(mailOptions, (error) => {
         if (error) {
           console.error(error);
-          resolve(false);
+          reject(error);
         } else {
           resolve(true);
         }
