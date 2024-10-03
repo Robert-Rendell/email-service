@@ -28,6 +28,7 @@ export class EmailServiceStack extends cdk.Stack {
         FROM_EMAIL: process.env.FROM_EMAIL,
         FROM_EMAIL_PASS: process.env.FROM_EMAIL_PASS,
         TO_EMAIL: process.env.TO_EMAIL,
+        DISABLED: process.env.DISABLED ?? "false",
       },
       timeout: cdk.Duration.seconds(15),
     });

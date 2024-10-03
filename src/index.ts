@@ -61,6 +61,16 @@ export async function handler(
       body: errorMsg,
     };
   }
+
+  // SMTP provider keeps getting bounced from my email account.
+  // Don't try to send emails until I find another provider or better solution for deliverability.
+  if (process.env.DISABLED !== "false") {
+    console.warn("Emailing disabled using process.env.DISABLED");
+    return {
+      statusCode: 200,
+      body: "Emailing disabled",
+    };
+  }
   try {
     await EmailService.send({
       subject,
